@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Piskel → Arduino Converter | Arboria Plant Monitor</title>
+<title>Pixel Art → Arduino Converter | Arboria</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -341,8 +341,8 @@
 <header>
   <div class="logo">🌱</div>
   <div>
-    <h1>Piskel → Arduino Converter</h1>
-    <p>Arboria Plant Monitor — Bird Sprite Tool</p>
+    <h1>Pixel Art → Arduino Converter</h1>
+    <p>Arboria — TFT Sprite Tool</p>
   </div>
 </header>
 
@@ -352,19 +352,19 @@
   <div class="steps">
     <div class="step">
       <div class="step-num">Step 1</div>
-      <p>Draw your birds in <strong>Piskel</strong> using exactly 4 colours</p>
+      <p>Draw your sprite in <strong>Piskel</strong> using exactly <strong>4 colours</strong></p>
     </div>
     <div class="step">
       <div class="step-num">Step 2</div>
-      <p>Export as <strong>PNG Spritesheet</strong> — 32×64 px, 1 column, 2 rows</p>
+      <p>Export as <strong>PNG</strong> at scale <strong>1×</strong> — any size up to 128×160</p>
     </div>
     <div class="step">
       <div class="step-num">Step 3</div>
-      <p>Drop your PNG here and hit <strong>Convert</strong></p>
+      <p>Give your sprite a <strong>name</strong>, drop the PNG here</p>
     </div>
     <div class="step">
       <div class="step-num">Step 4</div>
-      <p>Copy the code and paste into <strong>Step 6</strong> of your sketch</p>
+      <p><strong>Copy the code</strong> and paste it into your Arduino sketch</p>
     </div>
   </div>
 
@@ -373,17 +373,46 @@
     <div class="card-header">
       <div class="card-icon">📁</div>
       <div>
-        <h2>Upload your Piskel spritesheet</h2>
-        <p>PNG file, 32 px wide × 64 px tall — 2 frames stacked vertically</p>
+        <h2>Upload your sprite PNG</h2>
+        <p>Any pixel art — up to 128×160 px, 4 colours, exported at scale 1×</p>
       </div>
     </div>
     <div class="card-body">
+
+      <!-- Sprite name input -->
+      <div style="margin-bottom:20px;">
+        <label style="font-size:13px;font-weight:600;display:block;margin-bottom:8px;">
+          Sprite variable name
+          <span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:6px;">used in the Arduino code</span>
+        </label>
+        <input
+          type="text"
+          id="sprite-name"
+          value="mySprite"
+          placeholder="e.g. happyBird, logo, heart"
+          style="
+            width:100%;
+            padding:10px 14px;
+            border:1.5px solid var(--border);
+            border-radius:8px;
+            font-family:'Space Mono',monospace;
+            font-size:13px;
+            color:var(--dark);
+            outline:none;
+            transition:border-color 0.15s;
+          "
+        >
+        <div style="font-size:11px;color:var(--muted);margin-top:6px;">
+          Letters and numbers only, no spaces — e.g. <code>happyBird</code>, <code>sadBird</code>, <code>logoIcon</code>
+        </div>
+      </div>
+
       <div id="dropzone">
         <input type="file" id="file-input" accept="image/png">
         <div class="drop-icon">🖼️</div>
         <h3>Drop your PNG here, or click to browse</h3>
-        <p>Top half = happy bird &nbsp;·&nbsp; Bottom half = sad bird</p>
-        <div class="format-badge">32 × 64 px · PNG · 4 colours</div>
+        <p>Max 128×160 px · PNG · 4 colours · scale 1×</p>
+        <div class="format-badge">PNG · 4 colours · scale 1×</div>
       </div>
 
       <div id="status-area" style="margin-top:16px;"></div>
@@ -396,21 +425,15 @@
       <div class="card-icon">👁️</div>
       <div>
         <h2>Preview</h2>
-        <p>How your birds will look on the TFT screen (96×96 px at scale ×3)</p>
+        <p>Your sprite rendered at scale ×3 — approximately how it looks on the TFT</p>
       </div>
     </div>
     <div class="card-body">
-      <div class="preview-grid">
+      <div style="display:flex;justify-content:center;margin-bottom:20px;">
         <div class="preview-box">
-          <div class="preview-label">😊 Happy bird (Frame 1 — top half)</div>
+          <div class="preview-label" id="preview-label">Sprite preview</div>
           <div class="preview-canvas-wrap">
-            <canvas id="canvas-happy" width="96" height="96" style="width:96px;height:96px;"></canvas>
-          </div>
-        </div>
-        <div class="preview-box">
-          <div class="preview-label">😢 Sad bird (Frame 2 — bottom half)</div>
-          <div class="preview-canvas-wrap">
-            <canvas id="canvas-sad" width="96" height="96" style="width:96px;height:96px;"></canvas>
+            <canvas id="canvas-bird" style="image-rendering:pixelated;"></canvas>
           </div>
         </div>
       </div>
@@ -434,10 +457,9 @@
     <div class="card-body">
       <div class="instructions" style="margin-bottom:20px;">
         <ol>
-          <li>In your Arduino sketch, find <strong>STEP 6</strong></li>
-          <li>Select from <span class="tag">const uint16_t BIRD_COLOURS</span> all the way down to the last line of <span class="tag">sadBird[256]</span></li>
-          <li>Delete that selection and paste this code in its place</li>
-          <li>Click Upload — your birds should appear!</li>
+          <li>Copy the code below</li>
+          <li>Paste the <span class="tag">SPRITE_COLOURS</span> line and the array into your Arduino sketch</li>
+          <li>Use the <span class="tag">drawSprite()</span> function to display it — pass in your array name, x position, y position, and scale</li>
         </ol>
       </div>
       <div class="code-block">
@@ -457,29 +479,39 @@
 
 <script>
 // ============================================================
-//  CONVERTER LOGIC
-//  All the conversion happens here in the browser — no server
-//  needed. Uses the HTML Canvas API to read pixel colours.
+//  UNIVERSAL PIXEL ART → ARDUINO CONVERTER
+//  Accepts any PNG up to 128x160, any variable name
 // ============================================================
 
 const dropzone   = document.getElementById('dropzone');
 const fileInput  = document.getElementById('file-input');
 const statusArea = document.getElementById('status-area');
 
-// --- File drop / click handling ---
+// ---- Name input: highlight on focus ----
+const nameInput = document.getElementById('sprite-name');
+nameInput.addEventListener('focus', () => nameInput.style.borderColor = 'var(--green)');
+nameInput.addEventListener('blur',  () => nameInput.style.borderColor = 'var(--border)');
+
+// ---- Sanitise variable name: letters/numbers only, no spaces ----
+function sanitiseName(raw) {
+  let clean = raw.replace(/[^a-zA-Z0-9_]/g, '');
+  if (/^[0-9]/.test(clean)) clean = 'sprite_' + clean; // can't start with number
+  return clean || 'mySprite';
+}
+
+// ---- File drop / click ----
 dropzone.addEventListener('dragover',  e => { e.preventDefault(); dropzone.classList.add('over'); });
 dropzone.addEventListener('dragleave', () => dropzone.classList.remove('over'));
 dropzone.addEventListener('drop', e => {
   e.preventDefault();
   dropzone.classList.remove('over');
-  const file = e.dataTransfer.files[0];
-  if (file) processFile(file);
+  if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]);
 });
 fileInput.addEventListener('change', () => {
   if (fileInput.files[0]) processFile(fileInput.files[0]);
 });
 
-// ---- CONVERT RGB to RGB565 ----
+// ---- RGB → RGB565 ----
 function toRGB565(r, g, b) {
   return ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
 }
@@ -487,7 +519,7 @@ function rgb565ToHex(v) {
   return '0x' + v.toString(16).toUpperCase().padStart(4, '0');
 }
 
-// ---- FIND NEAREST PALETTE COLOUR ----
+// ---- Nearest palette colour ----
 function nearestColour(r, g, b, palette) {
   let best = 0, bestDist = Infinity;
   palette.forEach(([pr, pg, pb], i) => {
@@ -497,17 +529,15 @@ function nearestColour(r, g, b, palette) {
   return best;
 }
 
-// ---- CONVERT PIXEL ROWS TO 2BPP BYTE ARRAY ----
+// ---- Pack pixels → 2bpp bytes ----
 function pixelsToBpp2(pixels, palette) {
-  // pixels = flat array of [r,g,b] for each pixel in row-major order
   const indices = pixels.map(([r,g,b]) => nearestColour(r,g,b,palette));
-  const total   = indices.length;
-  const nBytes  = Math.ceil(total / 4);
+  const nBytes  = Math.ceil(indices.length / 4);
   const bytes   = [];
   for (let i = 0; i < nBytes; i++) {
     let byte = 0;
     for (let j = 0; j < 4; j++) {
-      const idx = i*4+j < total ? indices[i*4+j] : 0;
+      const idx = i*4+j < indices.length ? indices[i*4+j] : 0;
       byte |= (idx & 0x03) << (6 - j*2);
     }
     bytes.push(byte);
@@ -515,27 +545,30 @@ function pixelsToBpp2(pixels, palette) {
   return bytes;
 }
 
-// ---- FORMAT BYTE ARRAY AS ARDUINO C ----
+// ---- Format as Arduino C array ----
 function formatArray(name, bytes) {
   const lines = [`const uint8_t PROGMEM ${name}[${bytes.length}] = {`];
   for (let i = 0; i < bytes.length; i += 16) {
-    const chunk  = bytes.slice(i, i+16);
-    const hex    = chunk.map(b => '0x' + b.toString(16).toUpperCase().padStart(2,'0')).join(',');
-    const comma  = i+16 < bytes.length ? ',' : '';
-    lines.push('  ' + hex + comma);
+    const chunk = bytes.slice(i, i+16);
+    const hex   = chunk.map(b => '0x' + b.toString(16).toUpperCase().padStart(2,'0')).join(',');
+    lines.push('  ' + hex + (i+16 < bytes.length ? ',' : ''));
   }
   lines.push('};');
   return lines.join('\n');
 }
 
-// ---- DRAW BIRD PREVIEW ON CANVAS ----
-function drawPreview(canvas, pixels, palette) {
-  const ctx   = canvas.getContext('2d');
-  const scale = 3;
-  ctx.clearRect(0, 0, 96, 96);
-  for (let row = 0; row < 32; row++) {
-    for (let col = 0; col < 32; col++) {
-      const [r,g,b] = pixels[row*32+col];
+// ---- Draw preview (scale to fit nicely) ----
+function drawPreview(canvas, pixels, W, H, palette) {
+  const scale = Math.min(Math.floor(192 / Math.max(W, H)), 8);
+  canvas.width  = W * scale;
+  canvas.height = H * scale;
+  canvas.style.width  = (W * scale) + 'px';
+  canvas.style.height = (H * scale) + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let row = 0; row < H; row++) {
+    for (let col = 0; col < W; col++) {
+      const [r,g,b] = pixels[row*W+col];
       const ci = nearestColour(r,g,b,palette);
       const [pr,pg,pb] = palette[ci];
       ctx.fillStyle = `rgb(${pr},${pg},${pb})`;
@@ -544,7 +577,7 @@ function drawPreview(canvas, pixels, palette) {
   }
 }
 
-// ---- SHOW STATUS MESSAGE ----
+// ---- Status message ----
 function showStatus(type, icon, message) {
   statusArea.innerHTML = `
     <div class="status ${type}">
@@ -553,124 +586,135 @@ function showStatus(type, icon, message) {
     </div>`;
 }
 
-// ---- MAIN: PROCESS THE UPLOADED FILE ----
+// ---- MAIN ----
 function processFile(file) {
-  if (!file.name.endsWith('.png') && file.type !== 'image/png') {
+  if (file.type !== 'image/png' && !file.name.endsWith('.png')) {
     showStatus('error', '❌', 'Please upload a PNG file.');
     return;
   }
+
+  const spriteName = sanitiseName(nameInput.value.trim());
+  nameInput.value  = spriteName; // show cleaned name
 
   const reader = new FileReader();
   reader.onload = e => {
     const img = new Image();
     img.onload = () => {
+      const W = img.width, H = img.height;
 
       // --- Size check ---
-      if (img.width !== 32 || img.height !== 64) {
+      if (W > 128 || H > 160) {
         showStatus('error', '❌',
-          `Expected a 32×64 px image but got ${img.width}×${img.height} px.<br>
-          In Piskel: Export → PNG → Spritesheet → 1 column → Scale 1×. Make sure your sprite is 32×32.`
+          `Image is ${W}×${H} px — maximum allowed is 128×160 px (the TFT screen size).<br>
+          In Piskel, make sure Scale is set to <strong>1×</strong> when exporting.`
         );
         return;
       }
 
-      // --- Read all pixels via canvas ---
+      // --- Read pixels ---
       const offscreen = document.createElement('canvas');
-      offscreen.width = 32; offscreen.height = 64;
+      offscreen.width = W; offscreen.height = H;
       const ctx = offscreen.getContext('2d');
       ctx.drawImage(img, 0, 0);
-      const imageData = ctx.getImageData(0, 0, 32, 64).data;
-
-      const allPixels = [];
-      for (let i = 0; i < 32*64; i++) {
-        allPixels.push([imageData[i*4], imageData[i*4+1], imageData[i*4+2]]);
+      const data = ctx.getImageData(0, 0, W, H).data;
+      const pixels = [];
+      for (let i = 0; i < W*H; i++) {
+        pixels.push([data[i*4], data[i*4+1], data[i*4+2]]);
       }
 
-      const topPixels    = allPixels.slice(0, 32*32);   // happy
-      const bottomPixels = allPixels.slice(32*32);       // sad
-
-      // --- Count unique colours ---
+      // --- Find palette (top 4 most common colours) ---
       const colourMap = new Map();
-      allPixels.forEach(([r,g,b]) => {
+      pixels.forEach(([r,g,b]) => {
         const key = `${r},${g},${b}`;
-        colourMap.set(key, (colourMap.get(key) || 0) + 1);
+        colourMap.set(key, (colourMap.get(key)||0)+1);
       });
-
       const sorted  = [...colourMap.entries()].sort((a,b) => b[1]-a[1]);
       const palette = sorted.slice(0,4).map(([k]) => k.split(',').map(Number));
 
-      // --- Warn if too many colours ---
+      // --- Status ---
       if (sorted.length > 4) {
         showStatus('warn', '⚠️',
-          `Found ${sorted.length} colours — expected 4. The converter will use the 4 most common ones, but some pixels may look slightly wrong. Go back to Piskel and make sure you're only using 4 colours.`
+          `Found ${sorted.length} colours — expected 4. Using the 4 most common. Go back to Piskel and reduce to exactly 4 colours for best results.`
         );
       } else {
         showStatus('ok', '✅',
-          `Loaded <strong>${file.name}</strong> — ${sorted.length} colours detected. Looking good!`
+          `Loaded <strong>${file.name}</strong> (${W}×${H} px) as <strong>${spriteName}</strong> — ${sorted.length} colours detected.`
         );
       }
 
-      // --- Draw previews ---
-      drawPreview(document.getElementById('canvas-happy'), topPixels, palette);
-      drawPreview(document.getElementById('canvas-sad'),   bottomPixels, palette);
+      // --- Preview ---
+      document.getElementById('preview-label').textContent = `${spriteName}  (${W}×${H} px)`;
+      drawPreview(document.getElementById('canvas-bird'), pixels, W, H, palette);
 
-      // --- Show palette chips ---
+      // --- Palette chips ---
       const palDisplay = document.getElementById('palette-display');
       palDisplay.innerHTML = '';
       palette.forEach(([r,g,b], i) => {
-        const rgb565 = toRGB565(r,g,b);
+        const v = toRGB565(r,g,b);
         palDisplay.innerHTML += `
           <div class="palette-chip">
             <div class="colour-swatch" style="background:rgb(${r},${g},${b})"></div>
-            [${i}] rgb(${r},${g},${b}) → ${rgb565ToHex(rgb565)}
+            [${i}] rgb(${r},${g},${b}) → ${rgb565ToHex(v)}
           </div>`;
       });
 
-      // --- Convert to 2bpp ---
-      const happyBytes = pixelsToBpp2(topPixels,    palette);
-      const sadBytes   = pixelsToBpp2(bottomPixels, palette);
-
-      // --- Build output code ---
+      // --- Convert ---
+      const bytes = pixelsToBpp2(pixels, palette);
       const colourValues = palette.map(([r,g,b]) => rgb565ToHex(toRGB565(r,g,b))).join(', ');
+
       const lines = [
         '// ============================================================',
-        '//  STEP 6 — Paste this block into your Arduino sketch',
-        '//',
-        `//  Generated from: ${file.name}`,
-        '//  32×32 px · 2bpp · 4 colours',
+        `//  Sprite: ${spriteName}`,
+        `//  Size:   ${W}×${H} px`,
+        '//  Format: 2bpp — 4 pixels per byte, 4 colour palette',
+        `//  Generated by Arboria Pixel Art Converter`,
         '// ============================================================',
         '',
-        '// Colour palette — paste this over the existing BIRD_COLOURS line',
-        `const uint16_t BIRD_COLOURS[4] = { ${colourValues} };`,
+        '// 4-colour palette in RGB565 format (for ST7735 TFT screen)',
+        `const uint16_t SPRITE_COLOURS[4] = { ${colourValues} };`,
         `//   [0] rgb(${palette[0].join(',')})`,
         `//   [1] rgb(${palette[1].join(',')})`,
         `//   [2] rgb(${palette[2].join(',')})`,
         `//   [3] rgb(${palette[3].join(',')})`,
         '',
-        '// Bird size settings',
-        '#define BIRD_W      32',
-        '#define BIRD_H      32',
-        '#define BIRD_SCALE   3',
+        '// Sprite dimensions',
+        `#define SPRITE_W  ${W}`,
+        `#define SPRITE_H  ${H}`,
         '',
-        '// Happy bird — top half of your spritesheet',
-        formatArray('happyBird', happyBytes),
+        '// Pixel data',
+        formatArray(spriteName, bytes),
         '',
-        '// Sad bird — bottom half of your spritesheet',
-        formatArray('sadBird', sadBytes),
+        '// ---- How to draw this sprite ----',
+        '// Call this function, passing your sprite array, x/y position, and scale:',
+        '//',
+        `//   drawSprite(${spriteName}, SPRITE_W, SPRITE_H, x, y, scale);`,
+        '//',
+        '// Example — draw centred on a 128x160 screen at scale 3:',
+        `//   int x = (128 - SPRITE_W * 3) / 2;`,
+        `//   int y = (160 - SPRITE_H * 3) / 2;`,
+        `//   drawSprite(${spriteName}, SPRITE_W, SPRITE_H, x, y, 3);`,
+        '//',
+        '// drawSprite function — paste this into your sketch:',
+        '//',
+        '// void drawSprite(const uint8_t* data, int w, int h, int x, int y, int scale) {',
+        '//   for (int row = 0; row < h; row++) {',
+        '//     for (int col = 0; col < w; col++) {',
+        '//       int px  = row * w + col;',
+        '//       int bi  = px / 4;',
+        '//       int sh  = 6 - (px % 4) * 2;',
+        '//       uint8_t ci = (pgm_read_byte(&data[bi]) >> sh) & 0x03;',
+        '//       tft.fillRect(x + col*scale, y + row*scale, scale, scale, SPRITE_COLOURS[ci]);',
+        '//     }',
+        '//   }',
+        '// }',
       ];
 
       const code = lines.join('\n');
       document.getElementById('code-output').textContent = code;
-
-      // --- Show sections ---
       document.getElementById('preview-section').style.display = 'block';
       document.getElementById('output-section').style.display  = 'block';
       document.getElementById('reset-btn').style.display       = 'inline-block';
-
-      // scroll to preview
-      document.getElementById('preview-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-      // store code for copy button
+      document.getElementById('preview-section').scrollIntoView({ behavior:'smooth', block:'start' });
       document.getElementById('copy-btn')._code = code;
     };
     img.src = e.target.result;
@@ -678,27 +722,24 @@ function processFile(file) {
   reader.readAsDataURL(file);
 }
 
-// ---- COPY BUTTON ----
+// ---- Copy button ----
 document.getElementById('copy-btn').addEventListener('click', function() {
   const code = this._code || document.getElementById('code-output').textContent;
   navigator.clipboard.writeText(code).then(() => {
     this.innerHTML = '<span>✅</span> Copied!';
     this.classList.add('copied');
-    setTimeout(() => {
-      this.innerHTML = '<span>📋</span> Copy code';
-      this.classList.remove('copied');
-    }, 2000);
+    setTimeout(() => { this.innerHTML = '<span>📋</span> Copy code'; this.classList.remove('copied'); }, 2000);
   });
 });
 
-// ---- RESET BUTTON ----
+// ---- Reset button ----
 document.getElementById('reset-btn').addEventListener('click', () => {
   document.getElementById('preview-section').style.display = 'none';
   document.getElementById('output-section').style.display  = 'none';
   document.getElementById('reset-btn').style.display       = 'none';
   statusArea.innerHTML = '';
   fileInput.value = '';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top:0, behavior:'smooth' });
 });
 </script>
 
