@@ -388,7 +388,7 @@
         <input
           type="text"
           id="mascot-name"
-          value="mymascot"
+          value="buddyMascot"
           placeholder="e.g. happyBird, logo, heart"
           style="
             width:100%;
@@ -458,7 +458,7 @@
       <div class="instructions" style="margin-bottom:20px;">
         <ol>
           <li>Copy the code below</li>
-          <li>Paste the <span class="tag">mascot_COLOURS</span> line and the array into your Arduino sketch</li>
+          <li>Paste the <span class="tag">buddy_palette</span> line and the array into your Arduino sketch</li>
           <li>Use the <span class="tag">drawmascot()</span> function to display it — pass in your array name, x position, y position, and scale</li>
         </ol>
       </div>
@@ -519,7 +519,7 @@ nameInput.addEventListener('blur',  () => nameInput.style.borderColor = 'var(--b
 function sanitiseName(raw) {
   let clean = raw.replace(/[^a-zA-Z0-9_]/g, '');
   if (/^[0-9]/.test(clean)) clean = 'mascot_' + clean; // can't start with number
-  return clean || 'mymascot';
+  return clean || 'buddyMascot';
 }
 
 // ---- File drop / click ----
@@ -694,7 +694,7 @@ function processFile(file) {
         '// ============================================================',
         '',
         '// 4-colour palette in RGB565 format (for ST7735 TFT screen)',
-        `const uint16_t mascot_COLOURS[4] = { ${colourValues} };`,
+        `const uint16_t buddy_palette[4] = { ${colourValues} };`,
         `//   [0] rgb(${palette[0].join(',')})`,
         `//   [1] rgb(${palette[1].join(',')})`,
         `//   [2] rgb(${palette[2].join(',')})`,
@@ -726,7 +726,7 @@ function processFile(file) {
         '//       int bi  = px / 4;',
         '//       int sh  = 6 - (px % 4) * 2;',
         '//       uint8_t ci = (pgm_read_byte(&data[bi]) >> sh) & 0x03;',
-        '//       tft.fillRect(x + col*scale, y + row*scale, scale, scale, mascot_COLOURS[ci]);',
+        '//       tft.fillRect(x + col*scale, y + row*scale, scale, scale, buddy_palette[ci]);',
         '//     }',
         '//   }',
         '// }',
